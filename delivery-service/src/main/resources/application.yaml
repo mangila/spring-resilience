@@ -1,0 +1,4 @@
+# Application config
+spring:
+  application:
+    name: delivery-service
