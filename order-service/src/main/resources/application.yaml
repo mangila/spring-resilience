@@ -13,3 +13,41 @@ spring:
     port: 5672
     username: myuser
     password: secret
+
+# Resilience4j config
+resilience4j:
+  circuitbreaker:
+    instances:
+      deliveryService:
+        sliding-window-type: count_based
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        waitDurationInOpenState: 50s
+        failureRateThreshold: 50
+        permittedNumberOfCallsInHalfOpenState: 3
+      rabbitMQ:
+        sliding-window-type: count_based
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        waitDurationInOpenState: 30s
+        failureRateThreshold: 50
+        permittedNumberOfCallsInHalfOpenState: 3
+  retry:
+    instances:
+      deliveryService:
+        maxAttempts: 3
+        waitDuration: 1s
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+      rabbitMQ:
+        maxAttempts: 3
+        waitDuration: 500ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+  ratelimiter:
+    instances:
+      httpController:
+        limitForPeriod: 10
+        limitRefreshPeriod: 1s
+        timeoutDuration: 500ms
+

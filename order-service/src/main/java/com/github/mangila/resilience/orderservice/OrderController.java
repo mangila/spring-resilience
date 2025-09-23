@@ -1,5 +1,6 @@
 package com.github.mangila.resilience.orderservice;
 
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ public class OrderController {
     }
 
     @PostMapping(consumes = "application/json")
+    @RateLimiter(name = "httpController")
     public ResponseEntity<String> createNewOrder(@RequestBody CreateNewOrderRequest request) {
         log.info("Creating new order {}", request);
         String id = orderService.createNewOrder(request);
@@ -23,6 +25,7 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
+    @RateLimiter(name = "httpController")
     public ResponseEntity<OrderDto> findOrder(@PathVariable String orderId) {
         return ResponseEntity.ok(orderService.findById(orderId));
     }

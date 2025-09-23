@@ -36,10 +36,9 @@ public class OrderService {
                 request.items(),
                 2.0);
         log.trace("Order enqueue to delivery service");
-        rabbitTemplate.convertAndSend(Config.NEW_ORDER_TO_DELIVERY_QUEUE, objectMapper.createObjectNode()
+        deliveryServiceClient.enqueueNewOrder(objectMapper.createObjectNode()
                 .put("id", order.id())
-                .put("address", request.address())
-                .toString());
+                .put("address", request.address()));
         log.trace("Order save to database");
         memoryDatabase.save(order);
         log.trace("Order created with id {}", id);
