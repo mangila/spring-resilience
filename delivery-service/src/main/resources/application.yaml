@@ -1,4 +1,9 @@
-# Application config
+# Spring config
 spring:
   application:
     name: delivery-service
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: myuser
+    password: secret
