@@ -18,13 +18,12 @@ public class RestErrorHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
 
-
     /**
      * Handle the exception thrown when the rate limiter is overloaded.
      */
     @ExceptionHandler(RequestNotPermitted.class)
     public ProblemDetail handleRequestNotPermittedException(RequestNotPermitted ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
     }
 
     /**
