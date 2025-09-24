@@ -9,4 +9,5 @@ public record OrderDto(
         String status,
         double price
 ) {
+    public static final OrderDto EMPTY = new OrderDto(null, null, null, null, 0.0);
 }

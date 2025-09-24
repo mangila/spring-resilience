@@ -54,6 +54,6 @@ public class OrderService {
                     );
                 })
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+                .orElse(OrderDto.EMPTY);
     }
 }

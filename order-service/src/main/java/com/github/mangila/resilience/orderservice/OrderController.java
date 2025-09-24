@@ -28,7 +28,11 @@ public class OrderController {
     @RateLimiter(name = "httpController")
     public ResponseEntity<OrderDto> findOrder(@PathVariable String orderId) {
         log.info("Finding order {}", orderId);
-        return ResponseEntity.ok(orderService.findById(orderId));
+        OrderDto dto = orderService.findById(orderId);
+        if (dto.equals(OrderDto.EMPTY)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(dto);
     }
 
 }
