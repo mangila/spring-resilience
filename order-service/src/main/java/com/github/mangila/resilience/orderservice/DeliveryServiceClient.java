@@ -2,7 +2,6 @@ package com.github.mangila.resilience.orderservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
@@ -44,12 +43,10 @@ public class DeliveryServiceClient {
         log.error("Failed to enqueue new order: {}", objectNode, exception);
     }
 
-    @CircuitBreaker(
-            name = "deliveryService",
-            fallbackMethod = "getDeliveryFallback")
     @Retry(
             name = "deliveryService",
             fallbackMethod = "getDeliveryFallback")
+    @CircuitBreaker(name = "deliveryService")
     public ObjectNode getDelivery(String orderId) {
         return restClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -60,8 +57,7 @@ public class DeliveryServiceClient {
     }
 
     public ObjectNode getDeliveryFallback(String orderId, Throwable throwable) {
-        System.err.println("Failed to get delivery for orderId: " + orderId);
-        throwable.printStackTrace();
+        log.error("Failed to get delivery for orderId: {}", orderId, throwable);
         return objectMapper.createObjectNode();
     }
 }

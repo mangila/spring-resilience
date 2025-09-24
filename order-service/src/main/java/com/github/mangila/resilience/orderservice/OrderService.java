@@ -1,5 +1,6 @@
 package com.github.mangila.resilience.orderservice;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Service;
@@ -43,8 +44,12 @@ public class OrderService {
                     return new OrderDto(
                             order.customerId(),
                             order.items(),
-                            json.get("address").asText(),
-                            json.get("status").asText(),
+                            json.optional("address")
+                                    .map(JsonNode::asText)
+                                    .orElse("UNKNOWN"),
+                            json.optional("status")
+                                    .map(JsonNode::asText)
+                                    .orElse("UNKNOWN"),
                             order.price()
                     );
                 })
