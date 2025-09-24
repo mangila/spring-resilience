@@ -29,7 +29,7 @@ public class OrderController {
     public ResponseEntity<OrderDto> findOrder(@PathVariable String orderId) {
         log.info("Finding order {}", orderId);
         OrderDto dto = orderService.findById(orderId);
-        if (dto.equals(OrderDto.EMPTY)) {
+        if (dto.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(dto);

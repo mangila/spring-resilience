@@ -10,4 +10,9 @@ public record OrderDto(
         double price
 ) {
     public static final OrderDto EMPTY = new OrderDto(null, null, null, null, 0.0);
+
+    public boolean isEmpty() {
+        return EMPTY.equals(this);
+    }
+
 }
