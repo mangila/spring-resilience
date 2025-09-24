@@ -26,4 +26,12 @@ public class RestErrorHandler {
     public ProblemDetail handleRequestNotPermittedException(RequestNotPermitted ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
+
+    /**
+     * Handle any unhandled runtime exception.
+     */
+    @ExceptionHandler(RuntimeException.class)
+    public ProblemDetail handleRuntimeException(RuntimeException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    }
 }

@@ -5,12 +5,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.AmqpConnectException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestClient;
+
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -41,6 +44,13 @@ public class DeliveryServiceClient {
 
     public void enqueueNewOrderFallback(ObjectNode objectNode, Throwable exception) {
         log.error("Failed to enqueue new order: {}", objectNode, exception);
+        if (Objects.requireNonNull(exception) instanceof AmqpConnectException ace) {
+            // handle connection error
+            log.error("RabbitMQ connection error: {}", ace.getMessage());
+        } else {
+            log.error("error: {}", exception.getMessage());
+            // queue DLQ or retry
+        }
     }
 
     @Retry(
