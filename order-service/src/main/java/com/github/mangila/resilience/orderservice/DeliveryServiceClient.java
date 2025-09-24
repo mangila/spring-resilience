@@ -2,8 +2,10 @@ package com.github.mangila.resilience.orderservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +14,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.client.RestClient;
 
 @Service
+@Slf4j
 public class DeliveryServiceClient {
 
     private final ObjectMapper objectMapper;
@@ -30,19 +33,15 @@ public class DeliveryServiceClient {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    @CircuitBreaker(
-            name = "rabbitMQ",
+    @Retry(name = "rabbit-mq-retry",
             fallbackMethod = "enqueueNewOrderFallback")
-    @Retry(
-            name = "rabbitMQ",
-            fallbackMethod = "enqueueNewOrderFallback")
+    @CircuitBreaker(name = "rabbit-mq-circuit-breaker")
     public void enqueueNewOrder(ObjectNode objectNode) {
         rabbitTemplate.convertAndSend(Config.NEW_ORDER_TO_DELIVERY_QUEUE, objectNode.toString());
     }
 
-    public void enqueueNewOrderFallback(ObjectNode objectNode, Throwable throwable) {
-        System.err.println("Failed to enqueue new order: " + objectNode.toString());
-        throwable.printStackTrace();
+    public void enqueueNewOrderFallback(ObjectNode objectNode, Throwable exception) {
+        log.error("Failed to enqueue new order: {}", objectNode, exception);
     }
 
     @CircuitBreaker(

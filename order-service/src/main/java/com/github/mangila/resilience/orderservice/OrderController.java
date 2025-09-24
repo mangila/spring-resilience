@@ -27,6 +27,7 @@ public class OrderController {
     @GetMapping("/{orderId}")
     @RateLimiter(name = "httpController")
     public ResponseEntity<OrderDto> findOrder(@PathVariable String orderId) {
+        log.info("Finding order {}", orderId);
         return ResponseEntity.ok(orderService.findById(orderId));
     }
 

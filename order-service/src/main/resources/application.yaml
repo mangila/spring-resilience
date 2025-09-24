@@ -25,13 +25,14 @@ resilience4j:
         waitDurationInOpenState: 50s
         failureRateThreshold: 50
         permittedNumberOfCallsInHalfOpenState: 3
-      rabbitMQ:
+      rabbit-mq-circuit-breaker:
         sliding-window-type: count_based
         slidingWindowSize: 10
         minimumNumberOfCalls: 5
         waitDurationInOpenState: 30s
         failureRateThreshold: 50
         permittedNumberOfCallsInHalfOpenState: 3
+    circuit-breaker-aspect-order: 1
   retry:
     instances:
       deliveryService:
@@ -39,11 +40,12 @@ resilience4j:
         waitDuration: 1s
         enableExponentialBackoff: true
         exponentialBackoffMultiplier: 2
-      rabbitMQ:
+      rabbit-mq-retry:
         maxAttempts: 3
         waitDuration: 500ms
         enableExponentialBackoff: true
         exponentialBackoffMultiplier: 2
+    retry-aspect-order: 2
   ratelimiter:
     instances:
       httpController:

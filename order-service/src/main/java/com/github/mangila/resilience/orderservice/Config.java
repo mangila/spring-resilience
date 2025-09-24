@@ -1,10 +1,7 @@
 package com.github.mangila.resilience.orderservice;
 
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.config.NamingConvention;
 import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -34,12 +31,5 @@ public class Config {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.USER_AGENT, applicationName)
                 .build();
-    }
-
-    @Bean
-    MeterRegistryCustomizer<MeterRegistry> customizer() {
-        return registry -> {
-            registry.config().namingConvention(NamingConvention.snakeCase);
-        };
     }
 }
