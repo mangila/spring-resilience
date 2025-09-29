@@ -23,20 +23,15 @@ public class OrderServiceListener {
     @RabbitListener(
             queues = "new-order-to-delivery-queue",
             containerFactory = "rabbitListenerContainerFactory",
-            executor = "rabbitListenerExecutor"
-    )
-    public void listen(String s) {
-        log.info("Received message: {}", s);
-        try {
-            ObjectNode jsonObj = (ObjectNode) objectMapper.readTree(s);
-            String orderId = jsonObj.get("id").asText();
-            String address = jsonObj.get("address").asText();
-            log.trace("Order Message: {} - {}", orderId, address);
-            Delivery delivery = new Delivery(orderId, address, "PENDING");
-            log.trace("Order saved to database: {}", delivery);
-            database.save(delivery);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+            errorHandler = "rabbitListenerErrorHandler",
+            executor = "rabbitVirtualThreadTaskExecutor")
+    public void listen(String s) throws JsonProcessingException {
+        ObjectNode jsonObj = (ObjectNode) objectMapper.readTree(s);
+        String orderId = jsonObj.get("id").asText();
+        String address = jsonObj.get("address").asText();
+        log.trace("Order Message: {} - {}", orderId, address);
+        Delivery delivery = new Delivery(orderId, address, "PENDING");
+        log.trace("Order saved to database: {}", delivery);
+        database.save(delivery);
     }
 }
