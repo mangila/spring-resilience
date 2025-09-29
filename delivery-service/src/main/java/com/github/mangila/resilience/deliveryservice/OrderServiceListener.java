@@ -1,11 +1,14 @@
 package com.github.mangila.resilience.deliveryservice;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 @Slf4j
@@ -25,8 +28,10 @@ public class OrderServiceListener {
             containerFactory = "rabbitListenerContainerFactory",
             errorHandler = "rabbitListenerErrorHandler",
             executor = "rabbitVirtualThreadTaskExecutor")
-    public void listen(String s) throws JsonProcessingException {
-        ObjectNode jsonObj = (ObjectNode) objectMapper.readTree(s);
+    public void listen(Message message, Channel channel) throws IOException {
+        log.info("Received message: {}", message);
+        log.info("channel: {}", channel);
+        ObjectNode jsonObj = objectMapper.readValue(message.getBody(), ObjectNode.class);
         String orderId = jsonObj.get("id").asText();
         String address = jsonObj.get("address").asText();
         log.trace("Order Message: {} - {}", orderId, address);

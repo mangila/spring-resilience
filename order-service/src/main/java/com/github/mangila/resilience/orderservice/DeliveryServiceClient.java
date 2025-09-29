@@ -1,18 +1,24 @@
 package com.github.mangila.resilience.orderservice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpConnectException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestClient;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.Objects;
 
 @Service
@@ -39,7 +45,16 @@ public class DeliveryServiceClient {
             fallbackMethod = "enqueueNewOrderFallback")
     @CircuitBreaker(name = "rabbit-mq-circuit-breaker")
     public void enqueueNewOrder(ObjectNode objectNode) {
-        rabbitTemplate.convertAndSend(Config.NEW_ORDER_TO_DELIVERY_QUEUE, objectNode.toString());
+        try {
+            byte[] bytes = objectMapper.writeValueAsBytes(objectNode);
+            Message message = MessageBuilder.withBody(bytes)
+                    .setContentType(MediaType.APPLICATION_JSON_VALUE)
+                    .setTimestamp(Date.from(Instant.now()))
+                    .build();
+            rabbitTemplate.send(Config.NEW_ORDER_TO_DELIVERY_QUEUE, message);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void enqueueNewOrderFallback(ObjectNode objectNode, Throwable exception) {
