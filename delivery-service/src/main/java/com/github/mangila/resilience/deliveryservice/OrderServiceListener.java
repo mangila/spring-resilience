@@ -34,9 +34,7 @@ public class OrderServiceListener {
         ObjectNode jsonObj = objectMapper.readValue(message.getBody(), ObjectNode.class);
         String orderId = jsonObj.get("id").asText();
         String address = jsonObj.get("address").asText();
-        log.trace("Order Message: {} - {}", orderId, address);
         Delivery delivery = new Delivery(orderId, address, "PENDING");
-        log.trace("Order saved to database: {}", delivery);
         database.save(delivery);
     }
 }
