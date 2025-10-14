@@ -1,6 +1,6 @@
 # spring-resilience
 
-Design for resilience is the engineering practice for the application so can withstand for failures and recover from them.
+Design for resilience is the engineering practice for the application to be able to withstand for failures and recover from them.
 
 Java and Spring Boot ecosystem can use a Resilience4j library to use stable and production-ready resilience patterns.
 
