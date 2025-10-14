@@ -12,7 +12,7 @@ To name a few of the resilience patterns:
 * Bulkhead Pattern
 * Rate Limiting
 * Fallback Pattern
-* Chaos Engineering
+* Chaos Engineering (not in Resilience4j)
 
 
 ### Circuit Breaker
